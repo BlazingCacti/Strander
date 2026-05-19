@@ -1,0 +1,36 @@
+Strander
+========
+
+This product includes software developed for, and is derived in concept and
+syntax from, Flowchart.fun (https://flowchart.fun), an open-source project
+by Tone Row (https://tone-row.com).
+
+Strander adapts the Flowchart.fun text-to-diagram authoring model for use
+inside Visual Studio Code. The parser used to interpret `.strand` documents
+is the `graph-selector` library (https://www.npmjs.com/package/graph-selector)
+published by Tone Row under its own open-source license.
+
+Strander is not affiliated with, sponsored by, or endorsed by Tone Row or
+Flowchart.fun. All Flowchart.fun trademarks remain the property of their
+respective owners.
+
+Third-party libraries
+---------------------
+
+This extension bundles the following libraries (see node_modules for
+individual license files):
+
+  - cytoscape
+  - cytoscape-cose-bilkent
+  - cytoscape-dagre
+  - cytoscape-elk
+  - cytoscape-fcose
+  - cytoscape-klay
+  - dagre
+  - deepmerge
+  - elkjs
+  - graph-selector
+  - klay
+
+Icon assets are pulled at runtime from the Google Material Design Icons
+project (https://github.com/google/material-design-icons), Apache License 2.0.

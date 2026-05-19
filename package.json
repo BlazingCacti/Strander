@@ -1,0 +1,157 @@
+{
+  "name": "strander",
+  "displayName": "Strander",
+  "description": "Strander brings the Flowchart.fun authoring experience to VS Code — a split-view text/visual editor for .strand flowcharts with drag-and-drop layout, Material icons, CSS theming, and live preview.",
+  "version": "0.1.0",
+  "publisher": "tbd",
+  "license": "MIT",
+  "icon": "media/icon.png",
+  "engines": {
+    "vscode": "^1.46.0"
+  },
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "keywords": [
+    "flowchart",
+    "diagram",
+    "graph",
+    "visualization",
+    "strand",
+    "flowchart.fun"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BlazingCacti/Strander"
+  },
+  "bugs": {
+    "url": "https://github.com/BlazingCacti/Strander/issues"
+  },
+  "homepage": "https://github.com/BlazingCacti/Strander#readme",
+  "activationEvents": [
+    "onLanguage:strand",
+    "onCustomEditor:strander.editor"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "strand",
+        "aliases": [
+          "Strand",
+          "strand"
+        ],
+        "extensions": [
+          ".strand"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "strand",
+        "scopeName": "source.strand",
+        "path": "./syntaxes/strand.tmLanguage.json"
+      }
+    ],
+    "customEditors": [
+      {
+        "viewType": "strander.editor",
+        "displayName": "Strander Visual Editor",
+        "selector": [
+          {
+            "filenamePattern": "*.strand"
+          }
+        ],
+        "priority": "option"
+      }
+    ],
+    "commands": [
+      {
+        "command": "strander.openTextEditor",
+        "title": "Strander: Open Text Editor",
+        "category": "Strander"
+      },
+      {
+        "command": "strander.openVisualEditor",
+        "title": "Strander: Open Visual Editor",
+        "category": "Strander"
+      },
+      {
+        "command": "strander.newFile",
+        "title": "Strander: New Strand File",
+        "category": "Strander"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "strander.openVisualEditor",
+          "when": "resourceExtname == .strand && activeEditor == 'workbench.editors.files.textFileEditor'",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "strander.openVisualEditor",
+          "when": "resourceExtname == .strand",
+          "group": "navigation@1"
+        }
+      ]
+    },
+    "configurationDefaults": {
+      "explorer.fileNesting.enabled": true,
+      "explorer.fileNesting.patterns": {
+        "*.strand": "${capture}.strand.meta"
+      }
+    }
+  },
+  "scripts": {
+    "postinstall": "node scripts/patch-graph-selector.js",
+    "vscode:prepublish": "npm run build",
+    "build": "node scripts/patch-graph-selector.js && npm run build:ext && npm run build:webview",
+    "build:ext": "tsc -p ./ && esbuild src/extension.ts --bundle --outfile=out/extension.js --platform=node --target=node18 --format=cjs --external:vscode --minify",
+    "build:webview": "esbuild src/webview/main.ts --bundle --outfile=media/webview.js --format=iife --target=es2020 --minify",
+    "watch": "npm-run-all -p watch:ext watch:webview",
+    "watch:ext": "tsc -watch -p ./",
+    "watch:webview": "esbuild src/webview/main.ts --bundle --outfile=media/webview.js --format=iife --target=es2020 --watch",
+    "compile": "npm run build",
+    "package": "bash scripts/build-prod.sh",
+    "install-local": "bash scripts/build-install-insiders.sh",
+    "pretest": "npm run build && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/cytoscape": "^3.21.9",
+    "@types/dagre": "^0.7.53",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.46.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.2.0",
+    "esbuild": "^0.28.0",
+    "eslint": "^9.39.3",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1"
+  },
+  "overrides": {
+    "diff": "^9.0.0",
+    "serialize-javascript": "^7.0.5"
+  },
+  "dependencies": {
+    "cytoscape": "^3.31.0",
+    "cytoscape-cose-bilkent": "^4.1.0",
+    "cytoscape-dagre": "^3.0.0",
+    "cytoscape-elk": "^2.3.0",
+    "cytoscape-fcose": "^2.2.0",
+    "cytoscape-klay": "^3.1.4",
+    "dagre": "^0.8.5",
+    "deepmerge": "^4.3.1",
+    "elkjs": "^0.11.1",
+    "graph-selector": "^0.13.0",
+    "klay": "^2.4.0"
+  }
+}

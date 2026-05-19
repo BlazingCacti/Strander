@@ -1,0 +1,111 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Strand",
+  "scopeName": "source.strand",
+  "patterns": [
+    { "include": "#line-comment" },
+    { "include": "#block-comment" },
+    { "include": "#container-open" },
+    { "include": "#container-close" },
+    { "include": "#edge-label" },
+    { "include": "#escape" },
+    { "include": "#node-id" },
+    { "include": "#class" },
+    { "include": "#attribute" },
+    { "include": "#reference" },
+    { "include": "#url" },
+    { "include": "#unicode-arrow" },
+    { "include": "#node-label-text" }
+  ],
+  "repository": {
+    "line-comment": {
+      "match": "(^|[^:])(//.*)$",
+      "captures": {
+        "2": { "name": "comment.line.double-slash.strand" }
+      }
+    },
+    "block-comment": {
+      "begin": "/\\*",
+      "end": "\\*/",
+      "name": "comment.block.strand"
+    },
+    "container-open": {
+      "match": "(\\{)\\s*$",
+      "captures": {
+        "1": { "name": "punctuation.section.block.begin.strand" }
+      }
+    },
+    "container-close": {
+      "match": "^\\s*(\\})\\s*$",
+      "captures": {
+        "1": { "name": "punctuation.section.block.end.strand" }
+      }
+    },
+    "edge-label": {
+      "match": "^(\\s+)([A-Za-z][\\w-]*)(\\s*)(:)(\\s.*)?$",
+      "captures": {
+        "2": { "name": "keyword.control.edge-label.strand" },
+        "4": { "name": "punctuation.separator.key-value.strand" },
+        "5": { "name": "string.unquoted.label.strand" }
+      }
+    },
+    "escape": {
+      "match": "\\\\[\\[\\](){}<>:#./]",
+      "name": "constant.character.escape.strand"
+    },
+    "node-id": {
+      "match": "(?:^|(?<=\\s))(#)([A-Za-z_][\\w-]*)",
+      "captures": {
+        "1": { "name": "punctuation.definition.entity.id.strand" },
+        "2": { "name": "entity.name.tag.node-id.strand" }
+      }
+    },
+    "class": {
+      "match": "(?:^|(?<=\\s))(\\.)([A-Za-z][\\w-]*)",
+      "captures": {
+        "1": { "name": "punctuation.definition.entity.class.strand" },
+        "2": { "name": "entity.other.attribute-name.class.css entity.other.attribute-name.class.strand" }
+      }
+    },
+    "attribute": {
+      "begin": "(?:^|(?<=\\s))(\\[)",
+      "beginCaptures": { "1": { "name": "punctuation.section.brackets.begin.strand" } },
+      "end": "(\\])",
+      "endCaptures": { "1": { "name": "punctuation.section.brackets.end.strand" } },
+      "patterns": [
+        {
+          "match": "([A-Za-z_][\\w-]*)(=)(\"[^\"]*\"|'[^']*'|[^\\]]*)",
+          "captures": {
+            "1": { "name": "entity.other.attribute-name.strand" },
+            "2": { "name": "keyword.operator.assignment.strand" },
+            "3": { "name": "string.quoted.strand" }
+          }
+        },
+        {
+          "match": "[A-Za-z_][\\w-]*",
+          "name": "entity.other.attribute-name.strand"
+        }
+      ]
+    },
+    "reference": {
+      "match": "(\\()([#.]?[A-Za-z_][\\w-]*)(\\))",
+      "captures": {
+        "1": { "name": "punctuation.section.parens.begin.strand" },
+        "2": { "name": "variable.parameter.reference.strand" },
+        "3": { "name": "punctuation.section.parens.end.strand" }
+      }
+    },
+    "url": {
+      "match": "\\bhttps?://[^\\s<>\"')]+",
+      "name": "markup.underline.link.strand"
+    },
+    "unicode-arrow": {
+      "match": "→|⇒|←|⇐|↑|↓|⇄|↔|⟶|⟵",
+      "name": "keyword.operator.arrow.strand"
+    },
+    "node-label-text": {
+      "match": "(?:[^.#\\[(\\n{}/\\\\]|(?<!\\s)[.#\\[]|\\\\[^\\[\\](){}<>:#./])+",
+      "name": "string.unquoted.node-label.strand"
+    }
+  }
+}
