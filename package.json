@@ -2,7 +2,7 @@
   "name": "strander",
   "displayName": "Strander",
   "description": "Strander brings the Flowchart.fun authoring experience to VS Code! A split-view text/visual editor for .strand flowcharts with drag-and-drop layout, Material icons, CSS theming, and live preview.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "blazingcacti",
   "license": "MIT",
   "icon": "media/icon.png",
@@ -10,16 +10,39 @@
     "vscode": "^1.46.0"
   },
   "categories": [
-    "Visualization",
-    "Other"
+    "Visualization"
   ],
   "keywords": [
     "flowchart",
+    "flow chart",
     "diagram",
-    "graph",
+    "diagramming",
     "visualization",
-    "strand",
-    "flowchart.fun"
+    "visual editor",
+    "node graph",
+    "workflow",
+    "workflow diagram",
+    "decision tree",
+    "state machine",
+    "graph editor",
+    "flowchart editor",
+    "text-to-diagram",
+    "text-to-flowchart",
+    "live preview",
+    "drag and drop",
+    "interactive diagram",
+    "visual programming",
+    "editor",
+    "developer tools",
+    "productivity",
+    "architecture diagram",
+    "process flow",
+    "graph visualization",
+    "flowchart.fun",
+    "graphviz",
+    "mermaid",
+    "dagre",
+    "elk"
   ],
   "repository": {
     "type": "git",

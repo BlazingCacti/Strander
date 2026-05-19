@@ -1,6 +1,12 @@
 # Change Log
 
-## 0.1.0 — Initial release as Strander
+## 0.1.1 - Publishing Corrections
+
+- Updated package metadata for publishing (description, keywords, publisher id).
+
+- Updated Logo
+
+## 0.1.0 - Initial release as Strander
 
 - Rebranded from `flowchat-code` to **Strander**.
 - File extension changed to `.strand` (sidecar metadata: `.strand.meta`).
