@@ -1,9 +1,9 @@
 {
   "name": "strander",
   "displayName": "Strander",
-  "description": "Strander brings the Flowchart.fun authoring experience to VS Code — a split-view text/visual editor for .strand flowcharts with drag-and-drop layout, Material icons, CSS theming, and live preview.",
+  "description": "Strander brings the Flowchart.fun authoring experience to VS Code! A split-view text/visual editor for .strand flowcharts with drag-and-drop layout, Material icons, CSS theming, and live preview.",
   "version": "0.1.0",
-  "publisher": "tbd",
+  "publisher": "blazingcacti",
   "license": "MIT",
   "icon": "media/icon.png",
   "engines": {
