@@ -699,9 +699,36 @@ function applyBackground(theme: FFTheme) {
 // =====================================================================
 // Icons — Google Material Design Icons fetched as SVG, tinted with text
 // color, cached as data URIs. flowchart-fun uses the same source URL.
+// Local file icons loaded via the extension backend (loadIconFile message).
 // =====================================================================
 const iconCache = new Map<string, string>();
 const iconInflight = new Map<string, Promise<string>>();
+
+const iconFileCache = new Map<string, string>();
+const iconFileInflight = new Map<string, (uri: string) => void>();
+
+function tintSvg(svg: string, color: string): string {
+  return svg.replace(/^(<svg[^>]*>)([\s\S]*)$/, (_m, head: string, body: string) => {
+    const cleanedBody = body.replace(/\sfill="([^"]*)"/g, (m, v: string) => v === 'none' ? m : '');
+    const cleanedHead = head.replace(/\sfill="[^"]*"/g, '').replace(/<svg/, `<svg fill="${color}"`);
+    return cleanedHead + cleanedBody;
+  });
+}
+
+function loadIconFile(path: string, color: string): Promise<string> {
+  const key = `${path}|${color}`;
+  if (iconFileCache.has(key)) { return Promise.resolve(iconFileCache.get(key)!); }
+  if (iconFileInflight.has(key)) {
+    return new Promise<string>((resolve) => {
+      const prev = iconFileInflight.get(key)!;
+      iconFileInflight.set(key, (uri: string) => { prev(uri); resolve(uri); });
+    });
+  }
+  return new Promise<string>((resolve) => {
+    iconFileInflight.set(key, resolve);
+    vscode.postMessage({ type: 'loadIconFile', path, key });
+  });
+}
 
 async function getIconDataUri(icon: string, color: string): Promise<string> {
   const key = `${icon}|${color}`;
@@ -761,9 +788,10 @@ function applyIcons(theme: FFTheme) {
   const basePad = Math.max(Number(theme.padding) || 0, 4);
   const fontSize = Number(theme.fontSize) || 16;
   const font = `${theme.fontWeight || 400} ${fontSize}px "${theme.fontFamily}"`;
-  cy.nodes('[icon]').forEach((ele) => {
+  cy.nodes().forEach((ele) => {
     const icon = String(ele.data('icon') ?? '').trim();
-    if (!icon) { return; }
+    const iconfile = String(ele.data('iconfile') ?? '').trim();
+    if (!icon && !iconfile) { return; }
     const isParent = ele.isParent();
     let placement = theme.iconPlacement || 'before';
     if (isParent) {
@@ -771,7 +799,7 @@ function applyIcons(theme: FFTheme) {
       else if (placement === 'below') { placement = 'after'; }
     }
     const color = String(ele.style('color') || theme.color || '#000');
-    getIconDataUri(icon, color).then((uri) => {
+    (iconfile ? loadIconFile(iconfile, color) : getIconDataUri(icon, color)).then((uri) => {
       if (!uri || !cy) { return; }
       const el = cy.getElementById(ele.id());
       if (el.empty()) { return; }
@@ -1751,6 +1779,26 @@ window.addEventListener('message', (event) => {
     applyUpdate(String(msg.text ?? ''), msg.meta ?? {});
     updateErrorBanner();
   }
+});
+
+window.addEventListener('message', (event) => {
+  const msg = event.data;
+  if (!msg || msg.type !== 'iconFileLoaded') { return; }
+  const key = String(msg.key ?? '');
+  let uri = '';
+  if (!msg.error) {
+    if (msg.mime === 'image/svg+xml' && typeof msg.svg === 'string') {
+      const color = key.includes('|') ? key.slice(key.lastIndexOf('|') + 1) : '#000';
+      const tinted = tintSvg(msg.svg, color);
+      uri = 'data:image/svg+xml;utf8,' + encodeURIComponent(tinted);
+    } else if (typeof msg.base64 === 'string') {
+      uri = `data:${msg.mime || 'application/octet-stream'};base64,${msg.base64}`;
+    }
+  }
+  iconFileCache.set(key, uri);
+  const resolve = iconFileInflight.get(key);
+  iconFileInflight.delete(key);
+  if (resolve) { resolve(uri); }
 });
 
 document.addEventListener('DOMContentLoaded', () => {

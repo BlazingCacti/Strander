@@ -14,7 +14,11 @@ echo "==> Building extension + webview"
 npm run build
 
 echo "==> Packaging .vsix"
-npx --yes @vscode/vsce package --no-yarn
+PRE_RELEASE_FLAG=""
+for arg in "$@"; do
+  [ "$arg" = "--pre-release" ] && PRE_RELEASE_FLAG="--pre-release"
+done
+npx --yes @vscode/vsce package --no-yarn $PRE_RELEASE_FLAG
 
 VSIX="$(ls -1 ./*.vsix | head -n 1)"
 echo ""

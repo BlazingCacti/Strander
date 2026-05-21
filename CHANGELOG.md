@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.2.0 — `[iconfile]` + pre-release builds
+
+- **New: `[iconfile=...]`** — load any local image file (SVG, PNG, JPG, GIF,
+  WebP) as a node icon. Paths are resolved relative to the `.strand` file
+  with Linux / macOS / Windows path styles all accepted; SVGs are tinted to
+  the node's text color, like Material Symbols icons.
+- Build scripts now support `--pre-release` (`npm run package:pre`,
+  `npm run install-local:pre`) for the VS Code Marketplace pre-release channel.
+
 ## 0.1.1 - Publishing Corrections
 
 - Updated package metadata for publishing (description, keywords, publisher id).

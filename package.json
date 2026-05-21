@@ -2,12 +2,12 @@
   "name": "strander",
   "displayName": "Strander",
   "description": "Strander brings the Flowchart.fun authoring experience to VS Code! A split-view text/visual editor for .strand flowcharts with drag-and-drop layout, Material icons, CSS theming, and live preview.",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "publisher": "blazingcacti",
   "license": "MIT",
   "icon": "media/icon.png",
   "engines": {
-    "vscode": "^1.46.0"
+    "vscode": "^1.74.0"
   },
   "categories": [
     "Visualization"
@@ -141,7 +141,9 @@
     "watch:webview": "esbuild src/webview/main.ts --bundle --outfile=media/webview.js --format=iife --target=es2020 --watch",
     "compile": "npm run build",
     "package": "bash scripts/build-prod.sh",
+    "package:pre": "bash scripts/build-prod.sh --pre-release",
     "install-local": "bash scripts/build-install-insiders.sh",
+    "install-local:pre": "bash scripts/build-install-insiders.sh --pre-release",
     "pretest": "npm run build && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test"

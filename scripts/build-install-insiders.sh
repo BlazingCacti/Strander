@@ -12,11 +12,16 @@ npm run build
 
 echo "==> Packaging .vsix"
 rm -f ./*.vsix
+PRE_RELEASE_FLAG=""
+for arg in "$@"; do
+  [ "$arg" = "--pre-release" ] && PRE_RELEASE_FLAG="--pre-release"
+done
 npx --yes @vscode/vsce package \
   --no-dependencies \
   --no-yarn \
   --skip-license \
-  --allow-missing-repository
+  --allow-missing-repository \
+  $PRE_RELEASE_FLAG
 
 VSIX="$(ls -1 ./*.vsix | head -n 1)"
 VSIX_ABS="$(cd "$(dirname "${VSIX}")" && pwd)/$(basename "${VSIX}")"

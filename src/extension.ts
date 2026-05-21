@@ -27,6 +27,51 @@ const DEFAULT_META = {
   nodePositions: {},
 };
 
+function parseIconfilePath(raw: string): string {
+  let s = String(raw || '').trim();
+  if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+    s = s.slice(1, -1);
+  }
+  s = s.replace(/\\/g, '/');
+  s = s.replace(/([^:/])\/{2,}/g, '$1/');
+  return s;
+}
+
+function isAbsolutePath(p: string): boolean {
+  return /^([a-zA-Z]:\/|\/)/.test(p);
+}
+
+async function resolveIconfileUri(documentUri: vscode.Uri, raw: string): Promise<vscode.Uri> {
+  const path = parseIconfilePath(raw);
+  if (!path) { throw new Error('Empty iconfile path'); }
+  let resolved = path;
+  if (resolved.startsWith('~/') || resolved === '~') {
+    const home = (process.env.HOME || process.env.USERPROFILE || '').replace(/\\/g, '/');
+    resolved = resolved.replace(/^~/, home);
+  }
+  const docDir = vscode.Uri.joinPath(documentUri, '..');
+  const candidates: vscode.Uri[] = [];
+  if (isAbsolutePath(resolved)) {
+    candidates.push(vscode.Uri.file(resolved));
+  } else {
+    const parts = resolved.split('/');
+    candidates.push(vscode.Uri.joinPath(docDir, ...parts));
+    for (const folder of vscode.workspace.workspaceFolders ?? []) {
+      candidates.push(vscode.Uri.joinPath(folder.uri, ...parts));
+    }
+  }
+  let lastError: unknown;
+  for (const candidate of candidates) {
+    try {
+      const stat = await vscode.workspace.fs.stat(candidate);
+      if (stat.type & vscode.FileType.File) { return candidate; }
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  throw new Error(`iconfile not found: ${raw}${lastError ? ` (${(lastError as any)?.message ?? lastError})` : ''}`);
+}
+
 function sidecarUri(uri: vscode.Uri): vscode.Uri {
   return uri.with({ path: uri.path + '.meta' });
 }
@@ -461,6 +506,28 @@ class FlowfunEditorProvider implements vscode.CustomTextEditorProvider {
         case 'parseOk':
           diagnostics.delete(document.uri);
           break;
+        case 'loadIconFile': {
+          const path = String(msg.path ?? '');
+          const key = String(msg.key ?? path);
+          try {
+            const iconUri = await resolveIconfileUri(document.uri, path);
+            const bytes = await vscode.workspace.fs.readFile(iconUri);
+            const lowerPath = iconUri.path.toLowerCase();
+            let mime = 'application/octet-stream';
+            if (lowerPath.endsWith('.svg')) { mime = 'image/svg+xml'; }
+            else if (lowerPath.endsWith('.png')) { mime = 'image/png'; }
+            else if (lowerPath.endsWith('.jpg') || lowerPath.endsWith('.jpeg')) { mime = 'image/jpeg'; }
+            else if (lowerPath.endsWith('.gif')) { mime = 'image/gif'; }
+            else if (lowerPath.endsWith('.webp')) { mime = 'image/webp'; }
+            const payload = mime === 'image/svg+xml'
+              ? { type: 'iconFileLoaded', key, mime, svg: Buffer.from(bytes).toString('utf8') }
+              : { type: 'iconFileLoaded', key, mime, base64: Buffer.from(bytes).toString('base64') };
+            webviewPanel.webview.postMessage(payload);
+          } catch (e: any) {
+            webviewPanel.webview.postMessage({ type: 'iconFileLoaded', key, error: String(e?.message ?? e) });
+          }
+          break;
+        }
       }
     });
   }
